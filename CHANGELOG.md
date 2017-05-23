@@ -3,6 +3,25 @@ SwiftyRSA Changelog
 
 # [master]
 
+ - SwiftyRSAError is now exposed as an enum so that it can be introspected.
+   [#68](https://github.com/TakeScoop/SwiftyRSA/issues/68)
+
+# [1.2.0]
+
+ - **Breaking**: SwiftyRSA ObjC was refactored under the hood to offer a better experience with both Swift and ObjC runtimes. To use SwiftyRSA with Objective-C use the following pod:
+
+   ```
+   pod 'SwiftyRSA/ObjC'
+   ```
+
+    - Other methods of integration – like Carthage – are unaffected.
+    - In Swift, `ClearMessage.verify` now returns a boolean instead of a `VerificationResult`.
+ 
+ - Fixed an issue that prevented private keys from loading if they contained an ASN1 header.
+   [#71](https://github.com/TakeScoop/SwiftyRSA/issues/71)
+ - Fixed an issue that prevented public/private keys from loading if their integers were represented with an Octet String ASN1 node.
+   [#70](https://github.com/TakeScoop/SwiftyRSA/issues/70)
+
 # [1.1.1]
 
  - Fixed Carthage integration by running SwiftLint only if it exists in a Pods directory.
@@ -81,6 +100,7 @@ We recommend to check out the new [usage instructions](./README.md) to migrate c
 Initial release.
 
 [master]: https://github.com/TakeScoop/SwiftyRSA/tree/master
+[1.2.0]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.2.0
 [1.1.1]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.1.1
 [1.1.0]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.1.0
 [1.0.0]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.0.0

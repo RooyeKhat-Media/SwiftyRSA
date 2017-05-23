@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftyRSA
+import XCTest
 
 struct TestError: Error {
     let description: String
@@ -29,6 +30,7 @@ struct TestError: Error {
         return (try! Data(contentsOf: URL(fileURLWithPath: pubPath)))
     }
     
+    @nonobjc
     static public func publicKey(name: String) throws -> PublicKey {
         guard let path = bundle.path(forResource: name, ofType: "pem") else {
             throw TestError(description: "Couldn't load key for provided path")
@@ -37,12 +39,31 @@ struct TestError: Error {
         return try PublicKey(pemEncoded: pemString)
     }
     
+    @objc(publicKeyWithName:error:)
+    static public func _objc_publicKey(name: String) throws -> _objc_PublicKey { // swiftlint:disable:this identifier_name
+        guard let path = bundle.path(forResource: name, ofType: "pem") else {
+            throw TestError(description: "Couldn't load key for provided path")
+        }
+        let pemString = try String(contentsOf: URL(fileURLWithPath: path))
+        return try _objc_PublicKey(pemEncoded: pemString)
+    }
+    
+    @nonobjc
     static public func privateKey(name: String) throws -> PrivateKey {
         guard let path = bundle.path(forResource: name, ofType: "pem") else {
             throw TestError(description: "Couldn't load key for provided path")
         }
         let pemString = try String(contentsOf: URL(fileURLWithPath: path))
         return try PrivateKey(pemEncoded: pemString)
+    }
+    
+    @objc(privateKeyWithName:error:)
+    static public func _objc_privateKey(name: String) throws -> _objc_PrivateKey { // swiftlint:disable:this identifier_name
+        guard let path = bundle.path(forResource: name, ofType: "pem") else {
+            throw TestError(description: "Couldn't load key for provided path")
+        }
+        let pemString = try String(contentsOf: URL(fileURLWithPath: path))
+        return try _objc_PrivateKey(pemEncoded: pemString)
     }
     
     static public func randomData(count: Int) -> Data {
@@ -52,6 +73,49 @@ struct TestError: Error {
         }
         return data
     }
+    
+    static func assertThrows(type: SwiftyRSAError, file: StaticString = #file, line: UInt = #line, block: (Void) throws ->  Void) {
+        do {
+            try block()
+            XCTFail("The line above should fail", file: file, line: line)
+        } catch {
+            guard let swiftyRsaError = error as? SwiftyRSAError else {
+                return XCTFail("Error is not a SwiftyRSAError", file: file, line: line)
+            }
+            XCTAssertEqual(swiftyRsaError, type, file: file, line: line)
+        }
+    }
 }
 // swiftlint:enable force_try
 // swiftlint:enable force_unwrapping
+
+extension SwiftyRSAError: Equatable {
+    public static func == (lhs: SwiftyRSAError, rhs: SwiftyRSAError) -> Bool {
+        switch (lhs, rhs) {
+        case
+            (.pemDoesNotContainKey, .pemDoesNotContainKey),
+            (.keyRepresentationFailed(_), .keyRepresentationFailed(_)),
+            (.keyAddFailed(_), .keyAddFailed(_)),
+            (.keyCopyFailed(_), .keyCopyFailed(_)),
+            (.tagEncodingFailed, .tagEncodingFailed),
+            (.asn1ParsingFailed, .asn1ParsingFailed),
+            (.invalidAsn1RootNode, .invalidAsn1RootNode),
+            (.invalidAsn1Structure, .invalidAsn1Structure),
+            (.invalidBase64String, .invalidBase64String),
+            (.chunkDecryptFailed(_), .chunkDecryptFailed(_)),
+            (.chunkEncryptFailed(_), .chunkEncryptFailed(_)),
+            (.stringToDataConversionFailed, .stringToDataConversionFailed),
+            (.dataToStringConversionFailed, .dataToStringConversionFailed),
+            (.invalidDigestSize(_), .invalidDigestSize(_)),
+            (.signatureCreateFailed(_), .signatureCreateFailed(_)),
+            (.signatureVerifyFailed(_), .signatureVerifyFailed(_)),
+            (.pemFileNotFound(_), .pemFileNotFound(_)),
+            (.derFileNotFound(_), .derFileNotFound(_)),
+            (.notAPublicKey, .notAPublicKey),
+            (.notAPrivateKey, .notAPrivateKey):
+            return true
+        default:
+            return false
+        }
+    }
+}

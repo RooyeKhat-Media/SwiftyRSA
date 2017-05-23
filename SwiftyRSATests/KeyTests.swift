@@ -37,7 +37,9 @@ class PublicKeyTests: XCTestCase {
         let str = try String(contentsOf: URL(fileURLWithPath: path), encoding: .utf8)
         let privateKey = try PrivateKey(pemEncoded: str)
         
-        XCTAssertThrowsError(try PublicKey(reference: privateKey.reference))
+        TestUtils.assertThrows(type: SwiftyRSAError.notAPublicKey) {
+            _ = try PublicKey(reference: privateKey.reference)
+        }
     }
     
     func test_initWithData() throws {
@@ -187,7 +189,9 @@ class PrivateKeyTests: XCTestCase {
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
         let publicKey = try PublicKey(data: data)
         
-        XCTAssertThrowsError(try PrivateKey(reference: publicKey.reference))
+        TestUtils.assertThrows(type: SwiftyRSAError.notAPrivateKey) {
+            _ = try PrivateKey(reference: publicKey.reference)
+        }
     }
     
     func test_initWithPEMString() throws {
@@ -240,5 +244,9 @@ class PrivateKeyTests: XCTestCase {
         let base64String = try privateKey.base64String()
         let newPrivateKey = try PrivateKey(base64Encoded: base64String)
         XCTAssertEqual(try? privateKey.data(), try? newPrivateKey.data())
+    }
+    
+    func test_headerAndOctetString() throws {
+        _ = try PrivateKey(pemNamed: "swiftyrsa-private-header-octetstring", in: bundle)
     }
 }

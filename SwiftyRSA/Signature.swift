@@ -8,9 +8,9 @@
 
 import Foundation
 
-@objc public class Signature: NSObject {
+public class Signature {
     
-    @objc public enum DigestType: Int {
+    public enum DigestType {
         case sha1
         case sha224
         case sha256
@@ -44,7 +44,7 @@ import Foundation
     /// - Throws: SwiftyRSAError
     public convenience init(base64Encoded base64String: String) throws {
         guard let data = Data(base64Encoded: base64String) else {
-            throw SwiftyRSAError(message: "Couldn't decode provided base64 string")
+            throw SwiftyRSAError.invalidBase64String
         }
         self.init(data: data)
     }
