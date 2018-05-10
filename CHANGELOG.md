@@ -3,6 +3,13 @@ SwiftyRSA Changelog
 
 # [master]
 
+# [1.4.0]
+
+ - Fixed compilation warnings for Xcode 9.1 / 9.2.
+ - Added support for Swift 4.1 and Xcode 9.3.
+ - Added ability to generate a RSA key pair by using `SwiftyRSA.generateRSAKeyPair`.
+   [#106](https://github.com/TakeScoop/SwiftyRSA/issues/106)
+
 # [1.3.0]
 
  - Added Swift 3.2 and 4.0 support.
@@ -103,6 +110,7 @@ We recommend to check out the new [usage instructions](./README.md) to migrate c
 Initial release.
 
 [master]: https://github.com/TakeScoop/SwiftyRSA/tree/master
+[1.4.0]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.4.0
 [1.3.0]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.3.0
 [1.2.0]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.2.0
 [1.1.1]: https://github.com/TakeScoop/SwiftyRSA/releases/tag/1.1.1
