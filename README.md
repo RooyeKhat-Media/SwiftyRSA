@@ -1,10 +1,12 @@
 SwiftyRSA
 =========
 
+**Maintainer(s):** [@ldiqual](https://github.com/ldiqual)
+
 [![](https://img.shields.io/cocoapods/v/SwiftyRSA.svg)](https://cocoapods.org/pods/SwiftyRSA)
 ![](https://img.shields.io/badge/carthage-compatible-brightgreen.svg)
 ![](https://img.shields.io/cocoapods/p/SwiftyRSA.svg)
-![](https://img.shields.io/badge/language-swift_3.2/4.0-brightgreen.svg)
+![](https://img.shields.io/badge/language-swift_3.2/4.2-brightgreen.svg)
 [![](https://circleci.com/gh/TakeScoop/SwiftyRSA.png?style=shield&circle-token=03e95e0cd05dab2e159cf65d6e62de1d1d84148e)](https://circleci.com/gh/TakeScoop/SwiftyRSA)
 
 **Public key RSA encryption in Swift.**
@@ -14,7 +16,7 @@ SwiftyRSA is used in the [Scoop](https://www.takescoop.com/) [iOS app](https://i
 Installation
 ------------
 
-### Swift 3.2 / 4.0
+### Swift 3.2 / 4.0+
 
 With Cocoapods:
 
@@ -123,7 +125,7 @@ let privateKey = try PrivateKey(reference: secKey)
 
 ```swift
 let str = "Clear Text"
-let clear = try ClearMessage(string: str, using: .utf8)    
+let clear = try ClearMessage(string: str, using: .utf8)
 let encrypted = try clear.encrypted(with: publicKey, padding: .PKCS1)
 
 let data = encrypted.data
@@ -165,7 +167,7 @@ let isSuccessful = try clear.verify(with: publicKey, signature: signature, diges
 ### Create a public/private RSA key pair
 
 ```swift
-let keyPair = SwiftRSA.generateRSAKeyPair(sizeInBits: 2048)
+let keyPair = SwiftyRSA.generateRSAKeyPair(sizeInBits: 2048)
 let privateKey = keyPair.privateKey
 let publicKey = keyPair.publicKey
 ```

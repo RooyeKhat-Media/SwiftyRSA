@@ -11,22 +11,6 @@ import Security
 
 public typealias Padding = SecPadding
 
-extension CFString: Hashable {
-    public var hashValue: Int {
-        return (self as String).hashValue
-    }
-    
-    static public func == (lhs: CFString, rhs: CFString) -> Bool {
-        return lhs as String == rhs as String
-    }
-}
-
-extension Data {
-    var hex: String {
-        return map { String(format: "%02hhx", $0) }.joined(separator: " ")
-    }
-}
-
 public enum SwiftyRSA {
     
     static func base64String(pemEncoded pemString: String) throws -> String {
@@ -86,7 +70,7 @@ public enum SwiftyRSA {
         // On iOS+, we can use `SecKeyCopyExternalRepresentation` directly
         if #available(iOS 10.0, *), #available(watchOS 3.0, *), #available(tvOS 10.0, *) {
             
-            var error: Unmanaged<CFError>? = nil
+            var error: Unmanaged<CFError>?
             let data = SecKeyCopyExternalRepresentation(reference, &error)
             guard let unwrappedData = data as Data? else {
                 throw SwiftyRSAError.keyRepresentationFailed(error: error?.takeRetainedValue())
@@ -128,12 +112,12 @@ public enum SwiftyRSA {
     ///   - size: Indicates the total number of bits in this cryptographic key
     /// - Returns: A touple of a private and public key
     /// - Throws: Throws and error if the tag cant be parsed or if keygeneration fails
-    @available(iOS 10.0, *) @available(watchOS 3.0, *) @available(tvOS 10.0, *)
+    @available(iOS 10.0, watchOS 3.0, tvOS 10.0, *)
     public static func generateRSAKeyPair(sizeInBits size: Int) throws -> (privateKey: PrivateKey, publicKey: PublicKey) {
         return try generateRSAKeyPair(sizeInBits: size, applyUnitTestWorkaround: false)
     }
     
-    @available(iOS 10.0, *) @available(watchOS 3.0, *) @available(tvOS 10.0, *)
+    @available(iOS 10.0, watchOS 3.0, tvOS 10.0, *)
     static func generateRSAKeyPair(sizeInBits size: Int, applyUnitTestWorkaround: Bool = false) throws -> (privateKey: PrivateKey, publicKey: PublicKey) {
       
         guard let tagData = UUID().uuidString.data(using: .utf8) else {
@@ -204,7 +188,7 @@ public enum SwiftyRSA {
                 kSecValueData: keyData,
                 kSecAttrKeyClass: keyClass,
                 kSecReturnPersistentRef: true,
-                kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked
+                kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock
             ]
             
             let addStatus = SecItemAdd(keyAddDict as CFDictionary, persistKey)
@@ -217,12 +201,12 @@ public enum SwiftyRSA {
                 kSecAttrApplicationTag: tagData,
                 kSecAttrKeyType: kSecAttrKeyTypeRSA,
                 kSecAttrKeyClass: keyClass,
-                kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked,
+                kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock,
                 kSecReturnRef: true,
             ]
             
             // Now fetch the SecKeyRef version of the key
-            var keyRef: AnyObject? = nil
+            var keyRef: AnyObject?
             let copyStatus = SecItemCopyMatching(keyCopyDict as CFDictionary, &keyRef)
             
             guard let unwrappedKeyRef = keyRef else {
@@ -276,7 +260,7 @@ public enum SwiftyRSA {
         
         // Detect whether the sequence only has integers, in which case it's a headerless key
         let onlyHasIntegers = nodes.filter { node -> Bool in
-            if case .integer(_) = node { // swiftlint:disable:this unused_optional_binding
+            if case .integer = node {
                 return false
             }
             return true
